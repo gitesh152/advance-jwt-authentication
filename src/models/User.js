@@ -62,7 +62,7 @@ UserSchema.statics.hashPassword = function (password) {
 
 /** DB level email validation (also doing app level validation using Joi) */
 UserSchema.path('email').validate(
-  (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+  (v) => typeof v === 'string' && v.length <= 254 && v.includes('@'),
   'Invalid email',
 );
 

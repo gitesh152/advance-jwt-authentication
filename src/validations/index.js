@@ -1,3 +1,1 @@
-import * as authValidation from './auth.validation.js';
-
-export { authValidation };
+export * as authValidation from './auth.validation.js';

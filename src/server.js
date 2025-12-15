@@ -9,35 +9,39 @@ import logger from './utils/logger.util.js';
 
 let server;
 
-(async () => {
-  try {
-    await connectDb(mongoUri);
-    server = app.listen(port, () =>
-      logger.info(`🚀 Server running PORT: ${port}`),
-    );
-  } catch (error) {
-    logger.error(`❌ Failed to start server`, error);
-    process.exit(1);
-  }
-})();
+try {
+  await connectDb(mongoUri);
+
+  server = app.listen(port, () => {
+    logger.info(`🚀 Server running PORT: ${port}`);
+  });
+} catch (error) {
+  logger.error('❌ Failed to start server', error);
+  process.exit(1);
+}
 
 /** Graceful server shutdown on errors/signals */
 const shutdown = (signal, code = 0) => {
-  logger.warn(`🔻 Recieved signal ${signal}, shutting down !!!`);
+  logger.warn(`🔻 Received signal ${signal}, shutting down !!!`);
+
   if (server) {
     server.close(() => {
-      logger.info(`HTTP Server closed.`);
+      logger.info('HTTP Server closed.');
+      process.exit(code);
     });
+  } else {
     process.exit(code);
   }
 };
 
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM', () => shutdown('SIGTERM'));
+
 process.on('uncaughtException', (error) => {
   logger.error('uncaughtException', error);
   shutdown('uncaughtException', 1);
 });
+
 process.on('unhandledRejection', (reason) => {
   logger.error('unhandledRejection', reason);
   shutdown('unhandledRejection', 1);
