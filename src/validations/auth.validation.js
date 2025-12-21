@@ -1,4 +1,5 @@
 import Joi from 'joi';
+
 const passwordRules = Joi.string()
   .min(8)
   .max(108)
@@ -13,22 +14,31 @@ const passwordRules = Joi.string()
   });
 
 export const registerSchema = Joi.object({
-  name: Joi.string().allow('').optional(),
-  email: Joi.string().email().lowercase().required(),
-  password: passwordRules,
-  confirmPassword: Joi.string().required().valid(Joi.ref('password')).messages({
-    'any.only': 'Confirm password must match password!',
+  body: Joi.object({
+    name: Joi.string().allow('').optional(),
+    email: Joi.string().email().lowercase().trim().required(),
+    password: passwordRules,
+    confirmPassword: Joi.string()
+      .required()
+      .valid(Joi.ref('password'))
+      .messages({
+        'any.only': 'Confirm password must match password!',
+      }),
   }),
 });
 
 export const loginSchema = Joi.object({
-  email: Joi.string().email().lowercase().required(),
-  password: Joi.string().required(),
+  body: Joi.object({
+    email: Joi.string().email().lowercase().trim().required(),
+    password: Joi.string().min(8).required(),
+  }),
 });
 
-export const refreshTokenCookieSchema = Joi.object({
-  refreshToken: Joi.string().required().messages({
-    'string.empty': 'Refresh token can not be empty!',
-    'any.required': 'Refresh token missing in cookies!',
+export const refreshTokenSchema = Joi.object({
+  cookies: Joi.object({
+    refreshToken: Joi.string().trim().min(10).required().messages({
+      'string.empty': 'Refresh token can not be empty!',
+      'any.required': 'Refresh token missing in cookies!',
+    }),
   }),
 });
