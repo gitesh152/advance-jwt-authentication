@@ -3,7 +3,7 @@ import rateLimit from 'express-rate-limit';
 
 import { authController } from '../controllers/index.js';
 import authentication from '../middlewares/authentication.middleware.js';
-import requestBodyValidation from '../middlewares/request.body.validation.middleware.js';
+import requestValidation from '../middlewares/request.validation.middleware.js';
 import { authValidation } from '../validations/index.js';
 
 const router = express.Router();
@@ -26,18 +26,23 @@ const refreshRateLimiter = rateLimit({
 
 router.post(
   '/register',
-  requestBodyValidation(authValidation.registerSchema),
+  requestValidation(authValidation.registerSchema),
   authController.register,
 );
 
 router.post(
   '/login',
   loginRateLimiter,
-  requestBodyValidation(authValidation.loginSchema),
+  requestValidation(authValidation.loginSchema),
   authController.login,
 );
 
-router.post('/refresh', refreshRateLimiter, authController.refresh);
+router.post(
+  '/refresh',
+  refreshRateLimiter,
+  requestValidation(authValidation.refreshTokenSchema),
+  authController.refresh,
+);
 
 router.post('/logout', authentication, authController.logout);
 

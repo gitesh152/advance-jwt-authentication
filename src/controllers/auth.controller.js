@@ -6,7 +6,6 @@ import { authService } from '../services/index.js';
 import { clearRefreshCookie, setRefreshCookie } from '../utils/cookie.util.js';
 import logger from '../utils/logger.util.js';
 import { hashToken } from '../utils/token.util.js';
-import { authValidation } from '../validations/index.js';
 
 export const register = async (req, res, next) => {
   try {
@@ -91,16 +90,7 @@ export const login = async (req, res, next) => {
 
 export const refresh = async (req, res, next) => {
   try {
-    const { error, value } = authValidation.refreshTokenCookieSchema.validate(
-      req.cookies || {},
-    );
-
-    if (error) {
-      return next(error);
-    }
-
-    const refreshToken = value.refreshToken;
-
+    const refreshToken = req.cookies?.refreshToken;
     const tokens = await authService.rotateTokens(refreshToken, {
       ip: req?.ip,
       userAgent: req.get('User-Agent'),
@@ -121,16 +111,7 @@ export const refresh = async (req, res, next) => {
 
 export const logout = async (req, res) => {
   try {
-    const { error, value } = authValidation.refreshTokenCookieSchema.validate(
-      req.cookies || {},
-    );
-
-    if (error) {
-      throw error;
-    }
-
-    const refreshToken = value.refreshToken;
-
+    const refreshToken = req.cookies?.refreshToken;
     const tokenHash = hashToken(refreshToken);
 
     const wasRevoked = await authService.revokeRefreshToken(tokenHash);

@@ -1,6 +1,5 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import { v4 as uuidv4 } from 'uuid';
 import { createLogger, format, transports } from 'winston';
@@ -8,9 +7,9 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 
 import requestContextUtil from './request.context.util.js';
 import { isProd } from '../config/env.config.js';
+import { getDirname } from '../utils/path.util.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = getDirname(import.meta.url);
 
 /** Ensure logs directory exists */
 const logDir = path.join(__dirname, '../../logs');
